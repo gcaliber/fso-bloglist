@@ -1,0 +1,40 @@
+@hostname = localhost
+@port = 3003
+@host = {{hostname}}:{{port}}
+
+GET http://{{host}}/api/blogs
+
+###
+
+POST http://{{host}}/api/blogs
+content-type: application/json
+
+{
+  "title": "Test Blog 1",
+  "author": "Mister Tester",
+  "url": "https://www.google.com",
+  "likes": 0
+}
+
+###
+
+POST http://{{host}}/api/blogs
+content-type: application/json
+
+{
+  "title": "Test Blog 2",
+  "author": "Mister Tester",
+  "url": "https://www.google.com",
+  "likes": 0
+}
+###
+
+POST http://{{host}}/api/blogs
+content-type: application/json
+
+{
+  "title": "Test Blog 3",
+  "author": "Mister Tester",
+  "url": "https://www.google.com",
+  "likes": 0
+}
