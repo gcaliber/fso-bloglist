@@ -13,7 +13,7 @@ const listWithOneBlog = [
     title: 'Go To Statement Considered Harmful',
     author: 'Edsger W. Dijkstra',
     url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 0,
+    likes: 5,
     __v: 0
   }
 ]
@@ -81,13 +81,14 @@ describe('total likes', () => {
   })
 })
 
+
 describe('favorite', () => {
   test('when list has only one blog, it has to be the favorite', () => {
     const result = listHelper.favoriteBlog(listWithOneBlog)
     expect(result).toEqual({
       title: 'Go To Statement Considered Harmful',
       author: 'Edsger W. Dijkstra',
-      likes: 0,
+      likes: 5
     })
   })
   
@@ -96,26 +97,45 @@ describe('favorite', () => {
     expect(result).toEqual({
       title: "Canonical string reduction",
       author: 'Edsger W. Dijkstra',
-      likes: 12,
+      likes: 12
     })
   })
 })
 
-describe('favorite', () => {
+
+describe('most blogs', () => {
   test('when list has only one blog, it is also the most blogs', () => {
     const result = listHelper.mostBlogs(listWithOneBlog)
     expect(result).toEqual({
       author: 'Edsger W. Dijkstra',
-      blogs: 1,
+      blogs: 1
     })
   })
   
-  // this is still wrong, function returns [ 'Robert C. Martin', 3 ] not an object
   test('list with serveral blogs returns author with the most blogs ', () => {
     const result = listHelper.mostBlogs(listWithSeveralBlog)
     expect(result).toEqual({
       author: 'Robert C. Martin',
-      blogs: 3,
+      blogs: 3
+    })
+  })
+})
+
+
+describe('most likes', () => {
+  test('when list has only one blog, its author has the most likes', () => {
+    const result = listHelper.mostLikes(listWithOneBlog)
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 5
+    })
+  })
+  
+  test('list with serveral blogs returns author with the most likes', () => {
+    const result = listHelper.mostLikes(listWithSeveralBlog)
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 17
     })
   })
 })

@@ -21,12 +21,26 @@ const favoriteBlog = (blogs) => {
 }
 
 const mostBlogs = (blogs) => {
-  return ld.maxBy(Object.entries(ld.countBy(blogs, blog => blog.author)), item => item[1])
+  const result = ld.maxBy(Object.entries(ld.countBy(blogs, blog => blog.author)), author => author[1])
+  return { author: result[0], blogs: result[1] }
 }
+
+const mostLikes = (blogs) => {
+  const authors = ld.uniq(blogs.map(blog => blog.author))
+  const likes = ld.map(authors, author =>
+    ld.sumBy(blogs, blog => 
+      blog.author === author ? blog.likes : 0
+    )
+  )
+  const i = ld.findKey(likes, n => n === ld.max(likes))
+  return { author: authors[i], likes: likes[i] }
+}
+
 
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
