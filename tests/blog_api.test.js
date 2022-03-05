@@ -1,25 +1,35 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const helper = require('./test_helper')
 
-// beforeEach(async () => {
-//   await Blog.deleteMany({})
+const mms = require('mongodb-memory-server')
+var mongod
 
-//   const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
-//   const promiseArray = blogObjects.map(blog => blog.save())
-//   await Promise.all(promiseArray)
-// })
+beforeAll(async () => {
+  mongod = await mms.MongoMemoryServer.create()
+  const mongooseOpts = { useNewUrlParser: true }
+  await mongoose.connect(mongod.getUri(), mongooseOpts);
+})
+
+beforeEach(async () => {
+  await Blog.deleteMany({})
+
+  const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
+  const promiseArray = blogObjects.map(blog => blog.save())
+  await Promise.all(promiseArray)
+})
 
 test('all blogs are returned', async () => {
   const response = await api.get('/api/blogs')
   
-  // expect(response.body).toHaveLength(helper.initialBlogs.length)
-  expect(response.body).toHaveLength(1)
+  expect(response.body).toHaveLength(helper.initialBlogs.length)
 })
 
-afterAll(() => {
-  mongoose.connection.close()
+afterAll(async () => {
+  await mongoose.connection.dropDatabase();
+  await mongoose.connection.close();
+  await mongod.stop();
 })

@@ -8,13 +8,14 @@
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "lint": "eslint .",
     "lintfix": "eslint . --fix",
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand --forceExit"
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
   },
   "author": "Michael Green",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^8.10.0",
     "jest": "^27.5.1",
+    "mongodb-memory-server": "^8.4.0",
     "nodemon": "^2.0.15",
     "supertest": "^6.2.2"
   },
