@@ -1,7 +1,7 @@
 @hostname = localhost
 @port = 3003
 @host = {{hostname}}:{{port}}
-@rootToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYyMmNiMWZiY2ZiOGJjMzY1OTVkMDYxYSIsImlhdCI6MTY0NzA5NzE0MSwiZXhwIjoxNjQ3MTAwNzQxfQ.hG78FPM_ZkrwLYG9Lz-0wHrzX4Xbd6pkFxPw59kKJPo
+@rootToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYyMmNiMWZiY2ZiOGJjMzY1OTVkMDYxYSIsImlhdCI6MTY0NzA5OTY1MiwiZXhwIjoxNjQ3MTAzMjUyfQ.5_yhLABsPwbhNnAXeZD-yHuKisFycCAbEmPez8_azAY
 GET http://{{host}}/api/blogs
 
 ###
@@ -21,6 +21,7 @@ authorization: bearer {{rootToken}}
 
 POST http://{{host}}/api/blogs
 content-type: application/json
+authorization: bearer {{rootToken}}
 
 {
   "title": "Test Blog 2",
@@ -32,6 +33,7 @@ content-type: application/json
 
 POST http://{{host}}/api/blogs
 content-type: application/json
+authorization: bearer {{rootToken}}
 
 {
   "title": "Test Blog 3",
