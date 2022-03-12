@@ -1,0 +1,11 @@
+@hostname = localhost
+@port = 3003
+@host = {{hostname}}:{{port}}
+
+POST http://{{host}}/api/login
+content-type: application/json
+
+{ 
+  "username": "root",
+  "password" : "secretpassword"
+}
