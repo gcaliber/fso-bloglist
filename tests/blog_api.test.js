@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const jwt = require('jsonwebtoken')
 const app = require('../app')
 const api = supertest(app)
 const bcrypt = require('bcrypt')
@@ -18,10 +19,40 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
-  const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
-  const promiseArray = blogObjects.map(blog => blog.save())
-  await Promise.all(promiseArray)
+  const initialUsersHashed = await Promise
+    .all(helper.initialUsers.map(async (user) => {
+      return {
+        username: user.username,
+        name: user.name,
+        passwordHash: await bcrypt.hash(user.password, 10)
+      }
+  }))
+
+  const userObjects = initialUsersHashed.map(user => new User(user))
+
+  const userPromises = userObjects.map(user => user.save())
+  await Promise.all(userPromises)
+
+  const user0 = await User.findOne({ username: helper.initialUsers[0].username })
+
+  const blogObjects = helper.initialBlogs.map(blog => {
+    return new Blog({
+      author: blog.author,
+      title: blog.title,
+      url: blog.url,
+      likes: blog.likes,
+      user: user0._id
+    })
+  })
+
+  const blogPromises = blogObjects.map(blog => blog.save())
+  await Promise.all(blogPromises)
+  
+  const allBlogs = await Blog.find({})
+  user0.blogs = allBlogs.map(blog => blog._id)
+  await user0.save()
 })
 
 afterAll(async () => {
@@ -51,6 +82,17 @@ describe('get blogs', () => {
 })
 
 describe('adding new blogs', () => {
+  var token
+  beforeEach(async () => {
+    const user = await User.findOne({ username: helper.initialUsers[0].username })
+    const userForToken = {
+      username: user.username,
+      id: user._id,
+    }
+
+    token = jwt.sign(userForToken, process.env.SECRET)
+  })
+
   test('succeeds with valid data', async () => {
     const newBlog = {
       title: "Test Blog",
@@ -61,6 +103,7 @@ describe('adding new blogs', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('content-type', /application\/json/)
@@ -85,11 +128,13 @@ describe('adding new blogs', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(blogMissingTitle)
       .expect(400)
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(blogMissingUrl)
       .expect(400)
   })
@@ -103,6 +148,7 @@ describe('adding new blogs', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('content-type', /application\/json/)
@@ -110,14 +156,40 @@ describe('adding new blogs', () => {
     const testBlog = await Blog.findOne({title: "Test Blog"})
     expect(testBlog.likes).toBe(0)
   })
+
+  test('fails if no token is provided', async () => {
+    const newBlog = {
+      title: "Test Blog",
+      author: "Tester McBloggerson",
+      url: "www.iamatest.com"
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+      .expect('content-type', /application\/json/)
+  })
 })
 
 describe('deleting blogs', () => {
+  var token
+  beforeEach(async () => {
+    const user = await User.findOne({ username: helper.initialUsers[0].username })
+    const userForToken = {
+      username: user.username,
+      id: user._id,
+    }
+
+    token = jwt.sign(userForToken, process.env.SECRET)
+  })
+
   test('succeeds with valid id', async () => {
     const blog = await Blog.findOne({})
     const id = blog.toJSON().id
     await api
       .delete(`/api/blogs/${id}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(204)
   })
 
@@ -125,6 +197,7 @@ describe('deleting blogs', () => {
     const id = helper.nonExistingId()
     await api
       .delete(`/api/blogs/${id}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(400)
   })
 
@@ -132,7 +205,22 @@ describe('deleting blogs', () => {
     const id = "invalid"
     await api
       .delete(`/api/blogs/${id}`)
+      .set('Authorization', `bearer ${token}`)
       .expect(400)
+  })
+
+  test('fails if no token is provided', async () => {
+    const newBlog = {
+      title: "Test Blog",
+      author: "Tester McBloggerson",
+      url: "www.iamatest.com"
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+      .expect('content-type', /application\/json/)
   })
 })
 
@@ -149,7 +237,8 @@ describe('updating blogs', () => {
       author: original.author,
       title: updatedTitle,
       url: original.url,
-      likes: original.likes
+      likes: original.likes,
+      user: original.user
     }
 
     await api
@@ -180,15 +269,6 @@ describe('updating blogs', () => {
 })
 
 describe('when there is initially one user in db', () => {
-  beforeEach(async () => {
-    await User.deleteMany({})
-
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new User({ username: 'root', passwordHash })
-
-    await user.save()
-  })
-
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb()
 
