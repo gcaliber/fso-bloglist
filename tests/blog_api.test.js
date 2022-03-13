@@ -191,6 +191,12 @@ describe('deleting blogs', () => {
       .delete(`/api/blogs/${id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+
+    const titles = blogsAtEnd.map(n => n.title)
+    expect(titles).not.toContain(blog.title)
   })
 
   test('fails with non-existing id', async () => {
@@ -199,6 +205,9 @@ describe('deleting blogs', () => {
       .delete(`/api/blogs/${id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(400)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
   })
 
   test('fails with malformatted id', async () => {
@@ -207,6 +216,9 @@ describe('deleting blogs', () => {
       .delete(`/api/blogs/${id}`)
       .set('Authorization', `bearer ${token}`)
       .expect(400)
+    
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
   })
 
   test('fails if no token is provided', async () => {
@@ -221,6 +233,9 @@ describe('deleting blogs', () => {
       .send(newBlog)
       .expect(401)
       .expect('content-type', /application\/json/)
+    
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
   })
 })
 
