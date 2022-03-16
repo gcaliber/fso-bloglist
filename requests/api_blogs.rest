@@ -1,7 +1,7 @@
 @hostname = localhost
 @port = 3003
 @host = {{hostname}}:{{port}}
-@rootToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYyMmNiMWZiY2ZiOGJjMzY1OTVkMDYxYSIsImlhdCI6MTY0NzA5OTY1MiwiZXhwIjoxNjQ3MTAzMjUyfQ.5_yhLABsPwbhNnAXeZD-yHuKisFycCAbEmPez8_azAY
+@rootToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjYyMmNiMWZiY2ZiOGJjMzY1OTVkMDYxYSIsImlhdCI6MTY0NzE5MTU2NCwiZXhwIjoxNjQ3MTk1MTY0fQ.OmlADTPeJe67PM85I163b_QbF79IbB8AibqV9RTuXlk
 GET http://{{host}}/api/blogs
 
 ###
@@ -41,3 +41,8 @@ authorization: bearer {{rootToken}}
   "url": "https://www.google.com",
   "likes": 2
 }
+
+###
+
+DELETE http://{{host}}/api/blogs/622252d3966e5e2ba41ceccb
+authorization: bearer {{rootToken}}
