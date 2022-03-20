@@ -8,7 +8,8 @@
     "dev": "cross-env NODE_ENV=development nodemon --trace-warnings index.js",
     "lint": "eslint .",
     "lintfix": "eslint . --fix",
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "start:test": "cross-env NODE_ENV=test node index.js"
   },
   "author": "Michael Green",
   "license": "MIT",
